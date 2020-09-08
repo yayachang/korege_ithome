@@ -1,2 +1,2 @@
 # korege_ithome
-iT幫鐵人賽
+第12屆iT邦幫忙鐵人賽-用KorGE開發自己的Kotlin小遊戲
