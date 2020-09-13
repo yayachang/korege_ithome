@@ -5,10 +5,7 @@ import com.soywiz.klock.seconds
 import com.soywiz.korev.Key
 import com.soywiz.korge.input.keys
 import com.soywiz.korge.scene.Scene
-import com.soywiz.korge.view.Container
-import com.soywiz.korge.view.addFixedUpdater
-import com.soywiz.korge.view.addHrUpdater
-import com.soywiz.korge.view.alignBottomToTopOf
+import com.soywiz.korge.view.*
 import com.soywiz.korio.async.delay
 import com.soywiz.korio.async.launchImmediately
 import gameplay.*
@@ -52,7 +49,18 @@ class GamePlay : Scene() {
         addChild(alien)
         alien.alignBottomToTopOf(ItemManager.BASE_FLOOR!!)
         alien.defaultHeight = alien.y
-        alien.x = ItemManager.BASE_WIDTH * 1
+        alien.x = ItemManager.BASE_WIDTH * -1
+        alien.addUpdater {
+            if(collidesWithShape(ItemManager.scoreItem)){
+                score.plus(1)
+            }
+            if(collidesWithShape(ItemManager.hurtItem)){
+                if(hurt()) {
+                    blood.minus()
+                }
+            }
+        }
+        ItemManager.setCollision(alien, this)
 
     }
 
@@ -65,6 +73,12 @@ class GamePlay : Scene() {
             }
             up(Key.SPACE) {
                 println("Key up")
+            }
+        }
+
+        addHrUpdater {
+            if (alien.x <= ItemManager.BASE_WIDTH) {
+                alien.x += 3
             }
         }
 
@@ -86,7 +100,7 @@ class GamePlay : Scene() {
 
     suspend fun loadCharacter(): Alien {
         return Alien().apply {
-            load()
+            load(Storage.SELECT_RUN_ALIEN)
             walk()
         }
     }

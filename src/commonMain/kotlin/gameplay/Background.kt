@@ -11,4 +11,7 @@ class Background : Item() {
     override suspend fun load() {
         image(resourcesVfs["bg_shroom.png"].readBitmap())
     }
+
+    override suspend fun setOffset(baseWidth:Double, baseHeight: Double) {
+    }
 }

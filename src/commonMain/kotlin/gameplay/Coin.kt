@@ -8,4 +8,8 @@ class Coin : Item() {
     override suspend fun load() {
         image(resourcesVfs["hud_coins.png"].readBitmap())
     }
+
+    override suspend fun setOffset(baseWidth: Double, baseHeight: Double) {
+
+    }
 }

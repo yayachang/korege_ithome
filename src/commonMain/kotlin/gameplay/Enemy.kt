@@ -1,14 +1,17 @@
 package gameplay
 
 import com.soywiz.klock.seconds
-import com.soywiz.korge.view.Sprite
-import com.soywiz.korge.view.SpriteAnimation
-import com.soywiz.korge.view.sprite
+import com.soywiz.korge.view.*
 import com.soywiz.korim.bitmap.Bitmap
+import com.soywiz.korim.color.Colors
 import com.soywiz.korim.format.readBitmap
 import com.soywiz.korio.file.std.resourcesVfs
+import com.soywiz.korma.geom.vector.rect
 
 class Enemy : Item() {
+
+    val offsetX = 20.0
+    val offsetY = 10.0
 
     lateinit var spriteMap: Bitmap
     lateinit var walkAnimation: SpriteAnimation
@@ -31,8 +34,15 @@ class Enemy : Item() {
         walkSprite = sprite(walkAnimation) {
             spriteDisplayTime = 0.1.seconds
         }
-
-
         walkSprite.playAnimationLooped()
+
+        hitShape {
+            rect(walkSprite.width - offsetX, walkSprite.height - offsetY, offsetX / 2, (walkSprite.height + offsetY) / 2)
+        }
+        //solidRect(walkSprite.width - offsetX, walkSprite.height - offsetY, Colors.BLUE).xy(offsetX / 2, (walkSprite.height + offsetY) / 2)
+    }
+
+    override suspend fun setOffset(baseWidth: Double, baseHeight: Double) {
+        y += (baseHeight - spriteMap.height)
     }
 }

@@ -27,6 +27,7 @@ class Blood : Container() {
             hearts.add(heart)
         }
     }
+
     fun initPosition() {
         hearts.forEachIndexed { index, image ->
             image.apply {

@@ -8,4 +8,6 @@ class Floor : Item() {
     override suspend fun load() {
         image(resourcesVfs["grassMid.png"].readBitmap())
     }
+    override suspend fun setOffset(baseWidth:Double, baseHeight: Double) {
+    }
 }
