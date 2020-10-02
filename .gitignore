@@ -3,3 +3,8 @@
 *.iml
 build
 src/commonMain/resources/score.txt
+client/.gradle
+client/.idea
+gradle
+server/.gradle
+server/.idea
