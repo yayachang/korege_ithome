@@ -32,21 +32,27 @@ class Alien : Container() {
     var status = STATUS.STAND
     var character = CHARACTER.GREEN
 
-    lateinit var spriteMap: Bitmap
     lateinit var walkAnimation: SpriteAnimation
     lateinit var hurtAnimation: SpriteAnimation
+    lateinit var goalAnimation: SpriteAnimation
 
     lateinit var sprite: Sprite
+    lateinit var walkBitmp: Bitmap
     lateinit var headBitmap: Bitmap
     lateinit var standBitmap: Bitmap
     lateinit var jumpBitmap: Bitmap
     lateinit var hurtBitmap: Bitmap
+    lateinit var deadBitmap: Bitmap
+    lateinit var goalBitmap: Bitmap
+
     var lastSTATUS = STATUS.WALK
 
     var defaultHeight = 0.0
 
     var alienWalkCount = 2
+    var alienGoalCount = 2
     var alienWalkSpeed = 0.3
+    var alienGoalSpeed = 0.3
 
 
     suspend fun load(character:CHARACTER) {
@@ -59,54 +65,67 @@ class Alien : Container() {
                 alienWalkSpeed = 0.1
                 headBitmap = resourcesVfs["green_alien_head.png"].readBitmap()
                 standBitmap = resourcesVfs["green_alien_stand.png"].readBitmap()
-                spriteMap = resourcesVfs["green_alien_walk.png"].readBitmap()
+                walkBitmp = resourcesVfs["green_alien_walk.png"].readBitmap()
                 hurtBitmap = resourcesVfs["green_alien_hurt.png"].readBitmap()
                 jumpBitmap = resourcesVfs["green_alien_jump.png"].readBitmap()
-
+                deadBitmap = hurtBitmap
+                goalBitmap = resourcesVfs["green_alien_goal.png"].readBitmap()
             }
             CHARACTER.PURPLE->{
                 alienWalkCount = 11
                 alienWalkSpeed = 0.1
                 headBitmap = resourcesVfs["purple_alien_head.png"].readBitmap()
                 standBitmap = resourcesVfs["purple_alien_stand.png"].readBitmap()
-                spriteMap = resourcesVfs["purple_alien_walk.png"].readBitmap()
+                walkBitmp = resourcesVfs["purple_alien_walk.png"].readBitmap()
                 hurtBitmap = resourcesVfs["purple_alien_hurt.png"].readBitmap()
                 jumpBitmap = resourcesVfs["purple_alien_jump.png"].readBitmap()
+                deadBitmap = hurtBitmap
+                goalBitmap = resourcesVfs["purple_alien_goal.png"].readBitmap()
+
             }
             CHARACTER.PINK->{
                 alienWalkCount = 11
                 alienWalkSpeed = 0.1
                 headBitmap = resourcesVfs["pink_alien_head.png"].readBitmap()
                 standBitmap = resourcesVfs["pink_alien_stand.png"].readBitmap()
-                spriteMap = resourcesVfs["pink_alien_walk.png"].readBitmap()
+                walkBitmp = resourcesVfs["pink_alien_walk.png"].readBitmap()
                 hurtBitmap = resourcesVfs["pink_alien_hurt.png"].readBitmap()
                 jumpBitmap = resourcesVfs["pink_alien_jump.png"].readBitmap()
+                deadBitmap = hurtBitmap
+                goalBitmap = resourcesVfs["pink_alien_goal.png"].readBitmap()
+
             }
             CHARACTER.BEIGE->{
                 alienWalkCount = 2
                 alienWalkSpeed = 0.3
                 headBitmap = resourcesVfs["beige_alien_head.png"].readBitmap()
                 standBitmap = resourcesVfs["beige_alien_stand.png"].readBitmap()
-                spriteMap = resourcesVfs["beige_alien_walk.png"].readBitmap()
+                walkBitmp = resourcesVfs["beige_alien_walk.png"].readBitmap()
                 hurtBitmap = resourcesVfs["beige_alien_hurt.png"].readBitmap()
                 jumpBitmap = resourcesVfs["beige_alien_jump.png"].readBitmap()
+                deadBitmap = hurtBitmap
+                goalBitmap = resourcesVfs["beige_alien_goal.png"].readBitmap()
+
             }
             CHARACTER.YELLOW->{
                 alienWalkCount = 2
                 alienWalkSpeed = 0.3
                 headBitmap = resourcesVfs["yellow_alien_head.png"].readBitmap()
                 standBitmap = resourcesVfs["yellow_alien_stand.png"].readBitmap()
-                spriteMap = resourcesVfs["yellow_alien_walk.png"].readBitmap()
+                walkBitmp = resourcesVfs["yellow_alien_walk.png"].readBitmap()
                 hurtBitmap = resourcesVfs["yellow_alien_hurt.png"].readBitmap()
                 jumpBitmap = resourcesVfs["yellow_alien_jump.png"].readBitmap()
+                deadBitmap = hurtBitmap
+                goalBitmap = resourcesVfs["yellow_alien_goal.png"].readBitmap()
+
             }
         }
 
         hurtAnimation = SpriteAnimation(spriteMap = hurtBitmap, spriteWidth = hurtBitmap.width, spriteHeight = hurtBitmap.height)
         walkAnimation = SpriteAnimation(
-                spriteMap = spriteMap,
-                spriteWidth =  spriteMap.width/alienWalkCount,
-                spriteHeight = spriteMap.height,
+                spriteMap = walkBitmp,
+                spriteWidth =  walkBitmp.width/alienWalkCount,
+                spriteHeight = walkBitmp.height,
                 marginTop = 0,
                 marginLeft = 0,
                 columns = alienWalkCount,
@@ -114,8 +133,38 @@ class Alien : Container() {
                 offsetBetweenColumns = 0,
                 offsetBetweenRows = 0
         )
-
+        goalAnimation  = SpriteAnimation(
+                spriteMap = goalBitmap,
+                spriteWidth =  goalBitmap.width/alienGoalCount,
+                spriteHeight = goalBitmap.height,
+                marginTop = 0,
+                marginLeft = 0,
+                columns = alienGoalCount,
+                rows = 1,
+                offsetBetweenColumns = 0,
+                offsetBetweenRows = 0
+        )
         sprite = sprite(standBitmap)
+    }
+
+    fun dead(){
+        if(status != STATUS.GOAL && status!=STATUS.DEAD) {
+            changeStatus()
+            sprite = sprite(deadBitmap)
+            status = STATUS.DEAD
+        }
+
+    }
+    fun goal(){
+        if(status != STATUS.GOAL && status!=STATUS.DEAD) {
+            changeStatus()
+            sprite = sprite(goalAnimation) {
+                spriteDisplayTime = alienGoalSpeed.seconds
+            }.apply {
+                playAnimationLooped()
+            }
+            status = STATUS.GOAL
+        }
     }
 
     fun hurt(): Boolean {
@@ -165,7 +214,7 @@ class Alien : Container() {
     }
 
     fun jump() {
-        if (status != STATUS.JUMP && status != STATUS.FALL) {
+        if (status != STATUS.JUMP && status != STATUS.FALL &&  status != STATUS.GOAL && status!=STATUS.DEAD)  {
             changeStatus()
             sprite = sprite(jumpBitmap)
             status = STATUS.JUMP
@@ -197,7 +246,11 @@ class Alien : Container() {
                     walk()
                 }
             }
-
+            STATUS.DEAD,STATUS.GOAL -> {
+                if (y < defaultHeight) {
+                    y = y + 6
+                }
+            }
         }
     }
 }

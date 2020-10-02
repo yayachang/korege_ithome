@@ -13,4 +13,8 @@ abstract class Item : Container() {
     fun move() {
         x -= moveSpeed
     }
+
+    fun stop(){
+        moveSpeed = 0
+    }
 }

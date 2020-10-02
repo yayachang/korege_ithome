@@ -1,7 +1,6 @@
 package gameplay
 
 import com.soywiz.korge.view.*
-import com.soywiz.korma.geom.vector.rect
 
 enum class ITEM_TYPE {
     NONE,
@@ -24,13 +23,17 @@ object ItemManager {
 
 
     fun init() {
+        items.clear()
+        scoreItem.clear()
+        hurtItem.clear()
+
         val stageValue = listOf<Int>(
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 2, 2, 2, 3, 2, 2, 2, 2, 4, 2, 2, 2,  2, 2, 2, 0, 0, 0, 0, 0, 0, 0,0,  2, 2, 2, 2, 2, 2,  2, 2, 2,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 2, 2, 4, 4, 2, 2, 2, 3, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
         var index = 0
         for (y in 0..5) {
@@ -38,14 +41,12 @@ object ItemManager {
                 val itemType = ITEM_TYPE.values()[stageValue[index++]]
                 val item = when (itemType) {
                     ITEM_TYPE.FLOOR -> {
-                        println("add floor")
                         Floor().run {
                             defaultX = x * BASE_WIDTH
                             position(defaultX, y * BASE_HEIGHT + OFFSET)
                         }
                     }
                     ITEM_TYPE.COIN -> {
-                        println("add coin")
                         Coin().run {
                             defaultX = x * BASE_WIDTH
                             position(defaultX, y * BASE_HEIGHT + OFFSET)
@@ -53,7 +54,6 @@ object ItemManager {
                     }
 
                     ITEM_TYPE.OBSTACLE -> {
-                        println("add obstacle")
                         Obstacle().run {
                             defaultX = x * BASE_WIDTH
                             position(defaultX, y * BASE_HEIGHT + OFFSET)
@@ -61,14 +61,12 @@ object ItemManager {
                     }
 
                     ITEM_TYPE.ENEMY -> {
-                        println("add enemy")
                         Enemy().run {
                             defaultX = x * BASE_WIDTH
                             position(defaultX, y * BASE_HEIGHT + OFFSET)
                         }
                     }
                     ITEM_TYPE.NONE -> {
-                        println("add empty")
                         null
                     }
 
@@ -96,7 +94,6 @@ object ItemManager {
             parentView.addChild(it)
             it.load()
             it.setOffset(BASE_WIDTH, BASE_HEIGHT)
-            println("item y:${it.y}")
             if (it is Floor) {
                 BASE_FLOOR = it
             }
@@ -136,6 +133,15 @@ object ItemManager {
         items.forEach {
             it.move()
         }
+    }
+
+    fun stop() {
+        items.forEach {
+            it.stop()
+        }
+        items.clear()
+        scoreItem.clear()
+        hurtItem.clear()
     }
 
     fun nextPage() {

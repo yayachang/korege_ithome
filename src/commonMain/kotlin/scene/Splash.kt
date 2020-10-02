@@ -13,9 +13,14 @@ import com.soywiz.korim.color.Colors
 import com.soywiz.korim.font.TtfFont
 import com.soywiz.korim.format.readBitmap
 import com.soywiz.korio.async.delay
+import com.soywiz.korio.async.launch
 import com.soywiz.korio.async.launchImmediately
+import com.soywiz.korio.dynamic.mapper.Mapper
+import com.soywiz.korio.dynamic.serialization.stringifyTyped
 import com.soywiz.korio.file.std.resourcesVfs
-import com.soywiz.korio.stream.openSync
+import com.soywiz.korio.net.http.*
+import com.soywiz.korio.serialization.json.Json
+import com.soywiz.korio.stream.*
 import com.soywiz.korma.interpolation.Easing
 import kotlinx.coroutines.Job
 
@@ -35,6 +40,8 @@ class Splash : Scene() {
     lateinit var tapString: Image
 
     override suspend fun Container.sceneInit() {
+
+
         ttfFont = TtfFont(resourcesVfs["NotoSans-Black.ttf"].readAll().openSync())
         image = image(resourcesVfs["splash.png"].readBitmap()) {
             anchor(0.5, 0.5)
@@ -63,23 +70,6 @@ class Splash : Scene() {
 
     override suspend fun Container.sceneMain() {
 
-        /*tapString.addFixedUpdater(100.milliseconds){
-            tapString.alpha -= 0.1
-            if(tapString.alpha <= 0){
-                tapString.alpha = 1.0
-            }
-            if(tapString.y < moveHeight){
-                tapString.y += 30
-            }
-        }*/
-        /*while (true) {
-            job = launchImmediately {
-                animate(completeOnCancel = true) {
-
-                }
-            }
-            job?.join()
-        }*/
         job = launchImmediately {
             while (true) {
                 animate(completeOnCancel = true) {
@@ -98,4 +88,6 @@ class Splash : Scene() {
         }
         job?.join()
     }
+
 }
+

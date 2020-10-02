@@ -4,9 +4,11 @@ import com.soywiz.klock.milliseconds
 import com.soywiz.klock.seconds
 import com.soywiz.korev.Key
 import com.soywiz.korge.input.keys
+import com.soywiz.korge.input.onClick
 import com.soywiz.korge.scene.Scene
 import com.soywiz.korge.view.*
 import com.soywiz.korio.async.delay
+import com.soywiz.korio.async.launch
 import com.soywiz.korio.async.launchImmediately
 import gameplay.*
 
@@ -65,6 +67,9 @@ class GamePlay : Scene() {
     }
 
     override suspend fun Container.sceneMain() {
+        onClick {
+            alien.jump()
+        }
 
         keys {
             down(Key.SPACE) {
@@ -84,6 +89,7 @@ class GamePlay : Scene() {
 
         delay(1000.milliseconds)
 
+        gameTimer.start()
         addFixedUpdater(1.seconds){
             gameTimer.minus()
         }
@@ -95,27 +101,45 @@ class GamePlay : Scene() {
             blood.update()
             score.update()
             gameTimer.update()
+            checkGameOver()
         }
     }
 
     suspend fun loadCharacter(): Alien {
         return Alien().apply {
-            load(Storage.SELECT_RUN_ALIEN)
+            load(SharedData.SELECT_RUN_ALIEN)
             walk()
         }
     }
 
-    suspend fun loadFloor() {
-        /*for (i in 0..14) {
-            floorList.add(
-                    Floor(this.sceneView).load().run{
-                        position(i * scaledWidth, ConfigModule.size.height - scaledHeight)
-                    })
-        }*/
+    fun checkGameOver(){
+        if(blood.nowValue == 0){
+            background.stop()
+            ItemManager.stop()
+            gameTimer.stop()
+            alien.dead()
+            SharedData.run {
+                GAME_SCORE = score.nowValue
+                IS_GAME_OVER_SUCCES = false
+            }
+            goToGameOver()
+        }else if(gameTimer.totalTime == 0){
+            background.stop()
+            ItemManager.stop()
+            alien.goal()
+            SharedData.run {
+                GAME_SCORE = score.nowValue
+                IS_GAME_OVER_SUCCES = true
+            }
+            goToGameOver()
+        }
     }
 
     fun goToGameOver() {
-        launchImmediately { sceneContainer.changeTo<GameOver>() }
+        launchImmediately {
+            delay(2.seconds)
+            sceneContainer.changeTo<GameOver>()
+        }
     }
 
 }

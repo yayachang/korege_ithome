@@ -35,8 +35,8 @@ class Score : Container() {
         return scoreBitmapSlice.extract(value * BASE_WIDTH, 0, BASE_WIDTH, BASE_HEIGHT)
     }
 
-    fun initPosition() {
-        scoreHead.position(defaultX, defaultY)
+    fun initPosition(initX:Double = defaultX, initY:Double = defaultY) {
+        scoreHead.position(initX, initY)
 
         scores.forEachIndexed { index, image ->
             image.apply {

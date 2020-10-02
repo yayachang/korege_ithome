@@ -17,7 +17,6 @@ import com.soywiz.korim.color.Colors
 import com.soywiz.korim.font.TtfFont
 import com.soywiz.korim.format.readBitmap
 import com.soywiz.korio.async.launch
-import com.soywiz.korio.async.launchImmediately
 import com.soywiz.korio.file.std.resourcesVfs
 import com.soywiz.korio.stream.openSync
 import com.soywiz.korma.geom.degrees
@@ -120,7 +119,7 @@ class Menu : Scene() {
         val textString = "Choose An Alien to GO"
         val fontSize = 40.0
         fontBitmap = NativeImage(width = bg.width.toInt(), height = 100).apply {
-            getContext2d().fillText("Choose An Alien to GO",
+            getContext2d().fillText(textString,
                     x = 0,
                     y = fontSize,
                     font = ttfFont,
@@ -134,7 +133,7 @@ class Menu : Scene() {
 
         addUpdater {
             selectRunAlien?.also {
-                Storage.SELECT_RUN_ALIEN = it.character
+                SharedData.SELECT_RUN_ALIEN = it.character
 
                 if (headImage == null) {
                     headImage = image(it.headBitmap) {
@@ -154,10 +153,14 @@ class Menu : Scene() {
                         y += 10
 
                         onClick {
-                            statToGo = true
                             launch {
-                                delay(1.seconds)
-                                sceneContainer.changeTo<GamePlay>() }
+                                if (!statToGo) {
+                                    statToGo = true
+
+                                    delay(((CHARACTER.values().size - selectRunAlien!!.character.ordinal)*0.5).seconds)
+                                    sceneContainer.changeTo<GamePlay>()
+                                }
+                            }
                         }
 
                         launch {
@@ -174,8 +177,6 @@ class Menu : Scene() {
                 }
             }
         }
-
-
     }
 
     override suspend fun Container.sceneMain() {

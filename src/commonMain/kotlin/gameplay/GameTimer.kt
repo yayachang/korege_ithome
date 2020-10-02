@@ -18,15 +18,15 @@ class GameTimer : Container() {
     lateinit var timerHead: Image
     lateinit var timerBitmapSlice: Bitmap
     var timers = arrayListOf<Image>()
-    val initTime = 60
+    val initTime = 10
     var totalTime = initTime
+    var isStop = false
 
     suspend fun load() {
         timerHead = image(resourcesVfs["clock.png"].readBitmap())
         timerBitmapSlice = resourcesVfs["numbers.png"].readBitmap()
-        timers.add(image(loadScore(6)))
+        timers.add(image(loadScore(initTime/10)))
         timers.add(image(loadScore(0)))
-
     }
 
     private fun loadScore(value: Int): Bitmap {
@@ -52,7 +52,17 @@ class GameTimer : Container() {
     }
 
     fun minus(){
-        totalTime -=1
+        if(totalTime != 0 && !isStop){
+            totalTime -=1
+        }
+    }
+
+    fun start(){
+        isStop = false
+    }
+
+    fun stop(){
+        isStop = true
     }
 
     fun update() {
