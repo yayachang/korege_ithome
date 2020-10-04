@@ -3,6 +3,9 @@
 #### 本系列文章：
 https://ithelp.ithome.com.tw/users/20129789/ironman/3273
 
+#### Demo：
+![image](https://github.com/yayachang/korege_ithome/blob/master/alien_demo.gif)
+
 #### 開發環境：
 * IDE: IntelliJ
 
